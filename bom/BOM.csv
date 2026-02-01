@@ -1,0 +1,30 @@
+Part Number,Description,Quantity,Unit Price (USD),Source,Source URL,Safety Rating,Notes
+PZ-001,Piezoelectric Spark Igniter (BBQ/Grill type),6,2.99,eBay,https://www.ebay.com/sch/i.html?_nkw=piezo+spark+igniter,High voltage (15-30kV),Primary HV source
+HV-001,Copper Wire 28AWG (0.3mm) - 10m,1,4.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=28awg+copper+wire,Medium,Corona electrode wire
+HV-002,Aluminum Foil Tape 50mm x 50m,1,3.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=aluminum+foil+tape,Low,Ground plane electrode
+HV-003,High Voltage Diode 30kV 100mA (2CL2FL),3,1.85,AliExpress,https://www.aliexpress.com/wholesale?SearchText=30kv+high+voltage+diode,High,Rectification for piezo array
+AC-001,TV Speaker 6" Woofer (salvaged),1,5.00,eBay,https://www.ebay.com/sch/i.html?_nkw=6+inch+woofer+speaker,Low,Acoustic driver
+AC-002,TDA7498 Class-D Amplifier Board 2x100W,1,8.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=tda7498+amplifier+board,Low,Audio amplifier
+AC-003,MDF Board 300x300x12mm,1,4.50,Local hardware,Various,Low,Speaker enclosure
+CTRL-001,Arduino Nano (clone),1,3.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=arduino+nano,Low,Main controller
+CTRL-002,Raspberry Pi Pico,1,4.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=raspberry+pi+pico,Low,Secondary controller option
+MOSFET-001,IRLZ44N Logic Level MOSFET (10-pack),1,2.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=irlz44n,Medium,High current switching
+RELAY-001,5V Relay Module 4-channel,1,3.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=5v+relay+module+4+channel,Low,Fail-safe switching
+SENSOR-001,DHT22 Temperature/Humidity Sensor,2,3.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=dht22,Low,Thermal monitoring
+SENSOR-002,MiCS-2614 Ozone Sensor,1,12.00,AliExpress,https://www.aliexpress.com/wholesale?SearchText=mics-2614+ozone,Low,Ozone detection
+SENSOR-003,GUVA-S12SD UV Sensor,1,2.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=guva-s12sd,Low,UV monitoring
+SENSOR-004,INA219 Current Sensor Module,1,1.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=ina219,Low,Current monitoring
+AUDIO-001,MAX9814 Microphone Module (gain-adjustable),1,1.85,AliExpress,https://www.aliexpress.com/wholesale?SearchText=max9814,Low,SPL measurement
+LED-001,5mm LED Assorted Colors (50-pack),1,1.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=5mm+led,Low,Status indicators
+BUZZER-001,Piezo Buzzer 5V (active),2,0.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=piezo+buzzer+5v,Low,Audio warnings
+PSU-001,12V 5A Power Supply,1,6.99,eBay,https://www.ebay.com/sch/i.html?_nkw=12v+5a+power+supply,Medium,Main power
+CONN-001,Breadboard Jumper Wires (M-M/M-F/F-F 120pcs),1,2.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=breadboard+jumper+wires,Low,Connections
+MECH-001,Nylon Standoff Kit M3 (180pcs),1,3.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=m3+nylon+standoff,Low,Mounting hardware
+MECH-002,Acrylic Sheet 200x200x3mm (clear),1,2.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=acrylic+sheet+3mm,Low,Protective shielding
+GAME-001,Xbox 360 Controller (wired/PC),1,15.00,eBay,https://www.ebay.com/sch/i.html?_nkw=xbox+360+controller+wired,Low,User input
+FUSE-001,Glass Fuse 5x20mm Assorted Kit (100pcs),1,3.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=5x20mm+glass+fuse,Low,Circuit protection
+RES-001,Carbon Resistor Kit 1/4W (400pcs 1Ω-1MΩ),1,2.99,AliExpress,https://www.aliexpress.com/wholesale?SearchText=resistor+kit,Low,Bleeder resistors
+CAP-001,Ceramic Capacitor Kit 50V (300pcs),1,2.50,AliExpress,https://www.aliexpress.com/wholesale?SearchText=ceramic+capacitor+kit,Low,Filtering
+PCB-001,Prototype PCB 5x7cm (10-pack),1,3.50,AliExpress,https://www.aliexpress.com/wholesale?SearchTag=prototype+pcb,Low,Custom circuits
+,,,,,,,
+TOTAL,,,72.65,,,,UNDER $75 BUDGET

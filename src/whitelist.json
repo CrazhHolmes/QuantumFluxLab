@@ -1,0 +1,118 @@
+{
+  "description": "Whitelist of open-access domains for research paper scraping",
+  "version": "1.0.0",
+  "last_updated": "2026-01-31",
+  "whitelist": [
+    {
+      "domain": "arxiv.org",
+      "type": "preprint",
+      "description": "Cornell University preprint server",
+      "api_endpoint": "http://export.arxiv.org/api/query",
+      "reliable": true
+    },
+    {
+      "domain": "nasa.gov",
+      "type": "government",
+      "description": "NASA Technical Reports Server",
+      "api_endpoint": "https://ntrs.nasa.gov/api",
+      "reliable": true
+    },
+    {
+      "domain": "osti.gov",
+      "type": "government",
+      "description": "Department of Energy Office of Scientific and Technical Information",
+      "api_endpoint": "https://www.osti.gov/api/v1",
+      "reliable": true
+    },
+    {
+      "domain": "zenodo.org",
+      "type": "repository",
+      "description": "CERN-backed open science repository",
+      "api_endpoint": "https://zenodo.org/api",
+      "reliable": true
+    },
+    {
+      "domain": "orcid.org",
+      "type": "identifier",
+      "description": "Open Researcher and Contributor ID",
+      "reliable": true
+    },
+    {
+      "domain": "cern.ch",
+      "type": "institution",
+      "description": "CERN Document Server",
+      "reliable": true
+    },
+    {
+      "domain": "hal.science",
+      "type": "repository",
+      "description": "French open archive (HAL)",
+      "api_endpoint": "https://api.archives-ouvertes.fr",
+      "reliable": true
+    },
+    {
+      "domain": "pubmed.ncbi.nlm.nih.gov",
+      "type": "government",
+      "description": "PubMed Central (free full-text subset)",
+      "reliable": true
+    },
+    {
+      "domain": "doaj.org",
+      "type": "directory",
+      "description": "Directory of Open Access Journals",
+      "api_endpoint": "https://doaj.org/api/v3",
+      "reliable": true
+    },
+    {
+      "domain": "ojs.",
+      "type": "pattern",
+      "description": "Open Journal Systems (university journals)",
+      "reliable": false
+    },
+    {
+      "domain": "escholarship.org",
+      "type": "repository",
+      "description": "University of California eScholarship",
+      "reliable": true
+    },
+    {
+      "domain": "repository.",
+      "type": "pattern",
+      "description": "University repositories",
+      "reliable": false
+    },
+    {
+      "domain": "figshare.com",
+      "type": "repository",
+      "description": "Figshare data repository",
+      "api_endpoint": "https://api.figshare.com/v2",
+      "reliable": true
+    },
+    {
+      "domain": "dspace.",
+      "type": "pattern",
+      "description": "DSpace institutional repositories",
+      "reliable": false
+    },
+    {
+      "domain": "researchgate.net",
+      "type": "social",
+      "description": "ResearchGate (author-uploaded PDFs only)",
+      "reliable": false,
+      "notes": "Only use if PDF is clearly marked as author-uploaded preprint"
+    },
+    {
+      "domain": "academia.edu",
+      "type": "social",
+      "description": "Academia.edu (author-uploaded PDFs only)",
+      "reliable": false,
+      "notes": "Only use if PDF is clearly marked as author-uploaded preprint"
+    }
+  ],
+  "edu_domains": {
+    "description": "Educational institution domains (universities, colleges)",
+    "pattern": "*.edu",
+    "reliable": false,
+    "notes": "Must verify open access status per repository"
+  }
+}

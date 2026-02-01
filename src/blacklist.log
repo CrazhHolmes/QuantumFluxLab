@@ -1,0 +1,46 @@
+# Quantum-Flux Lab - Blacklist Log
+# All rejected/paywalled URLs are logged here for transparency
+# Format: [TIMESTAMP] URL - REASON
+# ============================================================================
+
+# Initial blacklist - known paywalled publishers
+# Created: 2026-01-31
+
+# Commercial Publishers - Paywalled
+[PUBLISHER] https://www.elsevier.com - Commercial publisher, paywalled access
+[PUBLISHER] https://www.springer.com - Commercial publisher, paywalled access
+[PUBLISHER] https://www.wiley.com - Commercial publisher, paywalled access
+[PUBLISHER] https://www.nature.com - Nature Publishing Group, paywalled (except OA subset)
+[PUBLISHER] https://www.science.org - AAAS, paywalled (except OA subset)
+[PUBLISHER] https://www.scopus.com - Elsevier database, paywalled
+[PUBLISHER] https://www.webofscience.com - Clarivate, paywalled
+[PUBLISHER] https://ieeexplore.ieee.org - IEEE, mostly paywalled (check for OA icon)
+[PUBLISHER] https://dl.acm.org - ACM, mostly paywalled
+[PUBLISHER] https://www.tandfonline.com - Taylor & Francis, mostly paywalled
+[PUBLISHER] https://www.degruyter.com - De Gruyter, mostly paywalled
+[PUBLISHER] https://www.emerald.com - Emerald Insight, mostly paywalled
+[PUBLISHER] https://www.sagepub.com - SAGE, mostly paywalled
+[PUBLISHER] https://www.karger.com - Karger, paywalled
+[PUBLISHER] https://www.aps.org - American Physical Society, mostly paywalled
+[PUBLISHER] https://journals.aps.org - Physical Review journals, mostly paywalled
+[PUBLISHER] https://aip.scitation.org - AIP Publishing, mostly paywalled
+[PUBLISHER] https://iopscience.iop.org - IOP Science, mostly paywalled
+
+# Specific rejected URLs (add as encountered)
+# ============================================================================
+
+# Example entries (uncomment and modify when rejecting URLs):
+# [2026-01-31T12:00:00Z] https://www.sciencedirect.com/science/article/pii/XXXXXXXX - 403 Forbidden, requires institutional access
+# [2026-01-31T12:00:00Z] https://link.springer.com/article/10.XXXX/XXXX-XXX - Paywall detected
+# [2026-01-31T12:00:00Z] https://onlinelibrary.wiley.com/doi/10.XXXX/XXXX - Subscription required
+
+# Whitelist overrides (open access exceptions found)
+# ============================================================================
+# [WHITELIST_OVERRIDE] https://www.nature.com/articles/XXXXX - Article marked as Open Access
+# [WHITELIST_OVERRIDE] https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.XXX.XXXXXX - Author PDF available
+
+# Statistics
+# ============================================================================
+# Total rejected: 0 (update counter as URLs are added)
+# Total whitelist overrides: 0
+# Last updated: 2026-01-31

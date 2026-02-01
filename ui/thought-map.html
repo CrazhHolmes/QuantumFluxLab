@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum-Flux Lab Thought Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0d1117;
+            color: #f0f6fc;
+            overflow: hidden;
+        }
+        
+        #canvas {
+            width: 100vw;
+            height: 100vh;
+            cursor: grab;
+        }
+        
+        #canvas:active {
+            cursor: grabbing;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #f0f6fc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .control-btn:hover {
+            background: #30363d;
+        }
+        
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(13, 17, 23, 0.95);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 12px;
+            z-index: 100;
+        }
+        
+        .legend h3 {
+            margin-bottom: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #8b949e;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .tooltip {
+            position: fixed;
+            background: rgba(13, 17, 23, 0.98);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 300px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .tooltip.visible {
+            opacity: 1;
+        }
+        
+        .tooltip h4 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .tooltip p {
+            color: #8b949e;
+            margin-bottom: 8px;
+        }
+        
+        .tooltip .citation {
+            color: #6e7681;
+            font-size: 11px;
+            font-style: italic;
+        }
+        
+        .title {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+        
+        .title h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .title p {
+            font-size: 12px;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        <h1>🧠 Research Thought Map</h1>
+        <p>Interactive visualization of discovery process</p>
+    </div>
+    
+    <canvas id="canvas"></canvas>
+    
+    <div class="controls">
+        <button class="control-btn" onclick="resetView()">Reset View</button>
+        <button class="control-btn" onclick="togglePhysics()">Toggle Physics</button>
+    </div>
+    
+    <div class="legend">
+        <h3>Node Types</h3>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #58a6ff;"></div>
+            <span>Core Concept</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #3fb950;"></div>
+            <span>Discovery</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #d29922;"></div>
+            <span>Physics Source</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #a371f7;"></div>
+            <span>Component</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f85149;"></div>
+            <span>Safety Factor</span>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        
+        let width, height;
+        let nodes = [];
+        let links = [];
+        let particles = [];
+        let physicsEnabled = true;
+        
+        let camera = { x: 0, y: 0, zoom: 1 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let hoveredNode = null;
+        
+        // Node types with colors
+        const TYPES = {
+            CORE: { color: '#58a6ff', size: 40 },
+            DISCOVERY: { color: '#3fb950', size: 30 },
+            PHYSICS: { color: '#d29922', size: 25 },
+            COMPONENT: { color: '#a371f7', size: 22 },
+            SAFETY: { color: '#f85149', size: 20 }
+        };
+        
+        // Research data
+        const researchData = {
+            nodes: [
+                // Core
+                { id: 'rpat', label: 'RPAT', type: 'CORE', x: 0, y: 0, 
+                  desc: 'Resonant Plasma Acoustic Trap - The central innovation combining multiple physical phenomena for levitation.',
+                  citation: 'Novel implementation v1.0' },
+                
+                // Discoveries
+                { id: 'piezo-hv', label: 'Piezo-HV Array', type: 'DISCOVERY', x: -200, y: -150,
+                  desc: 'Multiple piezo sparkers in phased array generate sustained corona without arc breakdown.',
+                  citation: 'NASA HDBK-4007' },
+                { id: 'corona', label: 'Corona Plasma', type: 'DISCOVERY', x: 200, y: -150,
+                  desc: 'Self-sustaining plasma sheet with ion density >10^12 cm^-3 for electrostatic pressure.',
+                  citation: 'Riba et al., Sensors 2021' },
+                { id: 'infrasound', label: 'Infrasound Trap', type: 'DISCOVERY', x: 0, y: -250,
+                  desc: 'Standing wave levitation at 14-40 Hz using TV woofer for acoustic confinement.',
+                  citation: 'Acoustic levitation theory' },
+                { id: 'ehd', label: 'EHD Thrust', type: 'DISCOVERY', x: -150, y: 150,
+                  desc: 'Electrohydrodynamic thrust from asymmetric capacitor configuration.',
+                  citation: 'Ianconescu et al., 2011' },
+                { id: 'coupling', label: 'Parametric Coupling', type: 'DISCOVERY', x: 150, y: 150,
+                  desc: 'Nonlinear coupling between HV corona and acoustic fields creates enhanced stability.',
+                  citation: 'Novel contribution' },
+                
+                // Physics sources
+                { id: 'paschen', label: "Paschen's Law", type: 'PHYSICS', x: -350, y: -250,
+                  desc: 'Breakdown voltage depends on pressure-gap product. Enables high-voltage operation at safe margins.',
+                  citation: 'NASA HDBK-4007' },
+                { id: 'biefeld', label: 'Biefeld-Brown', type: 'PHYSICS', x: -300, y: 50,
+                  desc: 'Thrust force in asymmetrical capacitor: T = I×d/μ - Fd',
+                  citation: 'J. Electrostatics 69 (2011)' },
+                { id: 'standing', label: 'Standing Waves', type: 'PHYSICS', x: 150, y: -350,
+                  desc: 'Acoustic pressure antinode for levitation: F = 2πVp/λ × p0 × sin(2kz)',
+                  citation: 'Acoustic levitation physics' },
+                
+                // Components
+                { id: 'arduino', label: 'Arduino Nano', type: 'COMPONENT', x: 300, y: 50,
+                  desc: 'Main controller with triple-redundant safety monitoring.',
+                  citation: 'Control system' },
+                { id: 'mosfet', label: 'MOSFET Array', type: 'COMPONENT', x: 300, y: 150,
+                  desc: 'IRLZ44N logic-level MOSFETs for piezo switching.',
+                  citation: 'Power electronics' },
+                { id: 'sensors', label: 'Safety Sensors', type: 'COMPONENT', x: 350, y: -50,
+                  desc: 'Temperature, ozone, UV, and current monitoring.',
+                  citation: 'Multi-sensor fusion' },
+                { id: 'woofer', label: 'TV Woofer', type: 'COMPONENT', x: 100, y: -450,
+                  desc: '6" speaker in ported enclosure for infrasound generation.',
+                  citation: 'Acoustic driver' },
+                
+                // Safety
+                { id: 'watchdog', label: 'Watchdog', type: 'SAFETY', x: 450, y: 0,
+                  desc: '100ms timeout watchdog timer for hardware fail-safe.',
+                  citation: 'Safety system' },
+                { id: 'relay', label: 'Safety Relay', type: 'SAFETY', x: 400, y: 100,
+                  desc: 'Triple-redundant shutdown: relay + MOSFET + fuse.',
+                  citation: 'Fail-safe design' },
+                { id: 'ozone', label: 'Ozone Limit', type: 'SAFETY', x: 250, y: -200,
+                  desc: 'OSHA 8-hr limit: 0.1 ppm. Shutdown at 0.08 ppm.',
+                  citation: 'OSHA standards' },
+                
+                // Time travel physics
+                { id: 'ctc', label: 'Closed Timelike Curves', type: 'PHYSICS', x: -400, y: 200,
+                  desc: 'Mathematically valid in GR with exotic matter. Dual warp drive configuration.',
+                  citation: 'arXiv:2309.10072' },
+                { id: 'delayed', label: 'Delayed Choice', type: 'PHYSICS', x: -350, y: 300,
+                  desc: 'Macroscopic quantum eraser demonstrates temporal nonlocality.',
+                  citation: 'arXiv:2205.14353' },
+                { id: 'warp', label: 'Warp Drive', type: 'PHYSICS', x: -200, y: 250,
+                  desc: 'Alcubierre metric modifications allow CTC construction.',
+                  citation: 'arXiv:2407.18993' }
+            ],
+            links: [
+                { source: 'rpat', target: 'piezo-hv' },
+                { source: 'rpat', target: 'corona' },
+                { source: 'rpat', target: 'infrasound' },
+                { source: 'rpat', target: 'ehd' },
+                { source: 'rpat', target: 'coupling' },
+                
+                { source: 'piezo-hv', target: 'paschen' },
+                { source: 'ehd', target: 'biefeld' },
+                { source: 'infrasound', target: 'standing' },
+                { source: 'corona', target: 'ehd' },
+                
+                { source: 'piezo-hv', target: 'mosfet' },
+                { source: 'mosfet', target: 'arduino' },
+                { source: 'arduino', target: 'sensors' },
+                { source: 'infrasound', target: 'woofer' },
+                
+                { source: 'arduino', target: 'watchdog' },
+                { source: 'watchdog', target: 'relay' },
+                { source: 'corona', target: 'ozone' },
+                
+                { source: 'ctc', target: 'delayed' },
+                { source: 'ctc', target: 'warp' },
+                { source: 'rpat', target: 'ctc', dashed: true }
+            ]
+        };
+        
+        function init() {
+            resize();
+            window.addEventListener('resize', resize);
+            
+            // Initialize nodes
+            nodes = researchData.nodes.map(n => ({
+                ...n,
+                vx: 0, vy: 0,
+                targetX: n.x,
+                targetY: n.y
+            }));
+            
+            // Initialize particles for visual effect
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    size: Math.random() * 2 + 1,
+                    alpha: Math.random() * 0.5 + 0.1
+                });
+            }
+            
+            // Event listeners
+            canvas.addEventListener('mousedown', onMouseDown);
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('mouseup', onMouseUp);
+            canvas.addEventListener('wheel', onWheel);
+            
+            animate();
+        }
+        
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        
+        function worldToScreen(x, y) {
+            return {
+                x: (x - camera.x) * camera.zoom + width / 2,
+                y: (y - camera.y) * camera.zoom + height / 2
+            };
+        }
+        
+        function screenToWorld(x, y) {
+            return {
+                x: (x - width / 2) / camera.zoom + camera.x,
+                y: (y - height / 2) / camera.zoom + camera.y
+            };
+        }
+        
+        function updatePhysics() {
+            if (!physicsEnabled) return;
+            
+            const dt = 0.1;
+            const friction = 0.9;
+            const springStrength = 0.01;
+            const repelStrength = 5000;
+            
+            // Apply forces
+            nodes.forEach((node, i) => {
+                // Spring force to target
+                const dx = node.targetX - node.x;
+                const dy = node.targetY - node.y;
+                node.vx += dx * springStrength * dt;
+                node.vy += dy * springStrength * dt;
+                
+                // Repulsion from other nodes
+                nodes.forEach((other, j) => {
+                    if (i === j) return;
+                    const dx = node.x - other.x;
+                    const dy = node.y - other.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const force = repelStrength / (dist * dist);
+                    node.vx += (dx / dist) * force * dt;
+                    node.vy += (dy / dist) * force * dt;
+                });
+                
+                // Link constraints
+                researchData.links.forEach(link => {
+                    if (link.source === node.id) {
+                        const target = nodes.find(n => n.id === link.target);
+                        if (target) {
+                            const dx = target.x - node.x;
+                            const dy = target.y - node.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            const targetDist = 150;
+                            const diff = dist - targetDist;
+                            const force = diff * 0.001;
+                            node.vx += (dx / dist) * force;
+                            node.vy += (dy / dist) * force;
+                        }
+                    }
+                });
+                
+                // Apply velocity
+                node.x += node.vx * dt;
+                node.y += node.vy * dt;
+                node.vx *= friction;
+                node.vy *= friction;
+            });
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw grid
+            ctx.strokeStyle = '#161b22';
+            ctx.lineWidth = 1;
+            const gridSize = 50 * camera.zoom;
+            const offsetX = (-camera.x * camera.zoom + width / 2) % gridSize;
+            const offsetY = (-camera.y * camera.zoom + height / 2) % gridSize;
+            
+            ctx.beginPath();
+            for (let x = offsetX; x < width; x += gridSize) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+            }
+            for (let y = offsetY; y < height; y += gridSize) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+            }
+            ctx.stroke();
+            
+            // Draw particles
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                
+                ctx.fillStyle = `rgba(88, 166, 255, ${p.alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Draw links
+            researchData.links.forEach(link => {
+                const source = nodes.find(n => n.id === link.source);
+                const target = nodes.find(n => n.id === link.target);
+                if (!source || !target) return;
+                
+                const s1 = worldToScreen(source.x, source.y);
+                const s2 = worldToScreen(target.x, target.y);
+                
+                ctx.strokeStyle = link.dashed ? '#6e7681' : '#30363d';
+                ctx.lineWidth = link.dashed ? 1 : 2;
+                ctx.setLineDash(link.dashed ? [5, 5] : []);
+                
+                // Gradient line
+                const gradient = ctx.createLinearGradient(s1.x, s1.y, s2.x, s2.y);
+                gradient.addColorStop(0, TYPES[source.type].color + '40');
+                gradient.addColorStop(1, TYPES[target.type].color + '40');
+                ctx.strokeStyle = gradient;
+                
+                ctx.beginPath();
+                ctx.moveTo(s1.x, s1.y);
+                ctx.lineTo(s2.x, s2.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            });
+            
+            // Draw nodes
+            nodes.forEach(node => {
+                const pos = worldToScreen(node.x, node.y);
+                const type = TYPES[node.type];
+                const isHovered = hoveredNode === node;
+                const size = (type.size + (isHovered ? 5 : 0)) * camera.zoom;
+                
+                // Glow
+                const gradient = ctx.createRadialGradient(
+                    pos.x, pos.y, 0,
+                    pos.x, pos.y, size * 2
+                );
+                gradient.addColorStop(0, type.color + '40');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, size * 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Node
+                ctx.fillStyle = type.color;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Border
+                ctx.strokeStyle = isHovered ? '#fff' : '#0d1117';
+                ctx.lineWidth = isHovered ? 3 : 2;
+                ctx.stroke();
+                
+                // Label
+                ctx.fillStyle = '#f0f6fc';
+                ctx.font = `${isHovered ? 'bold' : 'normal'} ${12 * camera.zoom}px system-ui`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(node.label, pos.x, pos.y + size + 5);
+            });
+        }
+        
+        function animate() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        // Mouse events
+        function onMouseDown(e) {
+            const pos = screenToWorld(e.clientX, e.clientY);
+            
+            // Check if clicked on node
+            const clickedNode = nodes.find(node => {
+                const dx = node.x - pos.x;
+                const dy = node.y - pos.y;
+                return Math.sqrt(dx * dx + dy * dy) < 40 / camera.zoom;
+            });
+            
+            if (clickedNode) {
+                showTooltip(e.clientX, e.clientY, clickedNode);
+            } else {
+                isDragging = true;
+                dragStart = { x: e.clientX, y: e.clientY };
+                hideTooltip();
+            }
+        }
+        
+        function onMouseMove(e) {
+            const pos = screenToWorld(e.clientX, e.clientY);
+            
+            // Find hovered node
+            hoveredNode = nodes.find(node => {
+                const dx = node.x - pos.x;
+                const dy = node.y - pos.y;
+                return Math.sqrt(dx * dx + dy * dy) < 40 / camera.zoom;
+            });
+            
+            canvas.style.cursor = hoveredNode ? 'pointer' : (isDragging ? 'grabbing' : 'grab');
+            
+            if (isDragging) {
+                const dx = (e.clientX - dragStart.x) / camera.zoom;
+                const dy = (e.clientY - dragStart.y) / camera.zoom;
+                camera.x -= dx;
+                camera.y -= dy;
+                dragStart = { x: e.clientX, y: e.clientY };
+            }
+            
+            if (tooltip.classList.contains('visible')) {
+                updateTooltipPosition(e.clientX, e.clientY);
+            }
+        }
+        
+        function onMouseUp() {
+            isDragging = false;
+        }
+        
+        function onWheel(e) {
+            e.preventDefault();
+            const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+            camera.zoom = Math.max(0.3, Math.min(3, camera.zoom * zoomFactor));
+        }
+        
+        // Tooltip functions
+        function showTooltip(x, y, node) {
+            tooltip.innerHTML = `
+                <h4>${node.label}</h4>
+                <p>${node.desc}</p>
+                <div class="citation">${node.citation}</div>
+            `;
+            tooltip.classList.add('visible');
+            updateTooltipPosition(x, y);
+        }
+        
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+        
+        function updateTooltipPosition(x, y) {
+            const rect = tooltip.getBoundingClientRect();
+            let left = x + 15;
+            let top = y + 15;
+            
+            if (left + rect.width > window.innerWidth) {
+                left = x - rect.width - 15;
+            }
+            if (top + rect.height > window.innerHeight) {
+                top = y - rect.height - 15;
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        }
+        
+        // Control functions
+        function resetView() {
+            camera = { x: 0, y: 0, zoom: 1 };
+        }
+        
+        function togglePhysics() {
+            physicsEnabled = !physicsEnabled;
+        }
+        
+        // Start
+        init();
+    </script>
+</body>
+</html>

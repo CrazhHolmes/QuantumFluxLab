@@ -1,0 +1,149 @@
+================================================================================
+RESEARCH CONSOLE - SAFETY LOG
+Generated: 2026-01-31T17:45:07Z
+Project: Multi-Modal Levitation & Field Generation Device
+================================================================================
+
+[2026-01-31 17:46:30] HIGH VOLTAGE SAFETY ANALYSIS
+Operating Voltage: 10-30 kV DC (from piezo sparker array)
+Source: Multiple BBQ piezo igniters (3-6 units)
+
+Paschen's Law Calculations:
+- Breakdown voltage in air: V_breakdown ≈ 3 kV/mm (standard conditions)
+- Operating gap: 30mm (electrode spacing)
+- Required voltage for corona: ~10-15 kV (well below 90kV breakdown)
+- Safety margin: 3:1 (operating at 1/3 of breakdown)
+
+Electric Field Limits:
+- Occupational exposure (IEEE C95.1): 5 kV/m (continuous), 20 kV/m (short term)
+- Device field at 1m distance: ~0.3 kV/m (safe)
+- Device field at 10cm: ~3 kV/m (warning zone)
+- SHUTDOWN TRIGGER: >4 kV/m at operator position
+
+[2026-01-31 17:48:15] CORONA/PLASMA SAFETY
+Ion Density Target: >10^12 cm^-3
+Ozone Generation Rate:
+- At 10^12 ion/cm³: ~0.1-0.3 ppm O3
+- OSHA 8-hr limit: 0.1 ppm
+- SHUTDOWN TRIGGER: >0.08 ppm (80% of limit)
+- Mitigation: Active ventilation, 60 CFM minimum
+
+UV Emission:
+- Corona produces 200-400nm UV (mostly UV-A/B)
+- Risk: Low at distances >30cm
+- SHUTDOWN TRIGGER: UV sensor >1 mW/cm² at operator position
+
+[2026-01-31 17:50:45] ACOUSTIC SAFETY ANALYSIS
+Infrasound Component: 14-40 Hz standing wave
+Audible Component: 100-1000 Hz (HV discharge hum)
+
+SPL Calculations:
+- Required for levitation: 140 dB at node
+- Distance scaling: -6 dB per doubling
+- At 1m from source: ~120 dB
+- OSHA limits:
+  * 115 dB: <15 minutes
+  * 120 dB: <1 minute  
+  * 140 dB: <0.1 second
+
+SHUTDOWN TRIGGERS:
+- Continuous operation: >110 dB at operator position
+- Short burst: >130 dB for >5 seconds
+
+Hearing Protection: Mandatory >100 dB
+
+[2026-01-31 17:53:20] THERMAL SAFETY
+Piezo Element Limits:
+- Curie temperature (depolarization): 150-300°C (varies by type)
+- Operating limit: 60°C (40% of Curie temp)
+- Heat generation: I²R losses in drive circuit
+- SHUTDOWN TRIGGER: >50°C on any piezo housing
+
+HV Component Temperature:
+- Spark gap electrodes: <100°C
+- Resistors: <70°C (1W rating)
+- SHUTDOWN TRIGGER: >80°C on any HV component
+
+[2026-01-31 17:55:00] FAIL-SAFE CIRCUIT DESIGN
+
+PRIMARY SHUTDOWN (Relay - Hardware):
+- Watchdog timer: 100ms timeout
+- Temperature sensors (3x): Piezo, HV zone, ambient
+- Ozone sensor: Electrochemical (MiCS-2614)
+- UV sensor: GUVA-S12SD
+- Manual emergency stop: Mushroom button
+- Logic: ANY trigger → Relay opens HV primary
+
+SECONDARY SHUTDOWN (MOSFET - Software):
+- Controller: Arduino Nano / Raspberry Pi Pico
+- Continuous monitoring: 10Hz sample rate
+- MOSFET: IRLZ44N (logic level, 47A rated)
+- Logic: Software threshold breach → MOSFET gate low
+
+TERTIARY PROTECTION (Fuse - Passive):
+- Primary: 2A slow-blow (110V/220V input)
+- Secondary: 0.5A fast-blow (HV supply rail)
+- Piezo individual: 0.1A each
+
+[2026-01-31 17:57:30] WARNING THRESHOLDS (Pre-Shutdown)
+YELLOW WARNING (LED + Low tone buzzer):
+- E-field: >2 kV/m at operator position
+- Temperature: >40°C on any component
+- Ozone: >0.05 ppm
+- SPL: >100 dB
+- Action: LED flash 1Hz, buzzer 2kHz @ 50% duty
+
+RED WARNING (LED + High tone buzzer):
+- E-field: >3 kV/m
+- Temperature: >45°C
+- Ozone: >0.07 ppm
+- SPL: >110 dB
+- Action: LED flash 5Hz, buzzer 4kHz continuous
+  Auto-shutdown in 10 seconds if acknowledged
+
+[2026-01-31 18:00:00] DISPOSAL PROTOCOLS
+
+Piezo Waste (Lead Zirconate Titanate - PZT):
+- Classification: Hazardous waste (lead content)
+- Disposal: EPA-approved hazardous waste facility
+- Recycling: Piezo manufacturers may accept returns
+- NEVER: Incinerate (toxic lead fumes)
+
+Ionized Air By-products:
+- Primary: Ozone (O3) - oxidizing agent
+- Secondary: Nitrogen oxides (NOx) at high power
+- Ventilation: Exhaust to outdoors
+- Environmental: No persistent contamination
+
+Electronic Waste:
+- Capacitors: Discharge before disposal
+- PCBs: E-waste recycling
+- Metals: Standard recycling
+
+[2026-01-31 18:02:00] OPERATOR SAFETY CHECKLIST
+
+Before Operation:
+□ Grounding strap worn
+□ UV-rated safety glasses
+□ Hearing protection (earmuffs + plugs for >120dB)
+□ Insulated gloves (HV rated, 30kV)
+□ Emergency stop accessible
+□ Ventilation confirmed operational
+□ Fire extinguisher (CO2 type) within reach
+□ First aid kit accessible
+
+During Operation:
+□ Maintain >1m from HV electrodes
+□ Monitor warning indicators
+□ Never operate alone
+□ Keep one hand in pocket (reduces current through heart)
+
+After Operation:
+□ Discharge all capacitors (bleeder resistors)
+□ Wait 5 minutes before touching HV components
+□ Store in locked container
+□ Log session parameters
+
+================================================================================
+END SAFETY LOG
+================================================================================

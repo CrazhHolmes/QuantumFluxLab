@@ -1,0 +1,170 @@
+```mermaid
+flowchart TB
+    subgraph POWER["Power Supply (12V 5A)"]
+        PSU[12V PSU]
+        F1[Fuse 2A]
+    end
+    
+    subgraph SAFETY["Triple Redundant Safety"]
+        WDT[Watchdog Timer]
+        RELAY[5V Relay Module]
+        MOSFET[IRLZ44N MOSFET]
+        ESTOP[E-Stop Button]
+    end
+    
+    subgraph CONTROLLER["Control System"]
+        ARD[Arduino Nano]
+        PICO[Raspberry Pi Pico]
+        GAME[Game Controller]
+    end
+    
+    subgraph SENSORS["Safety Sensors"]
+        TEMP[DHT22 Temp Sensor x2]
+        OZONE[MiCS-2614 Ozone]
+        UV[GUVA-S12SD UV]
+        CURRENT[INA219 Current]
+        MIC[MAX9814 Mic]
+    end
+    
+    subgraph HV_GENERATION["HV Generation (Piezo Array)"]
+        PZ1[Piezo 1]
+        PZ2[Piezo 2]
+        PZ3[Piezo 3]
+        PZ4[Piezo 4]
+        PZ5[Piezo 5]
+        PZ6[Piezo 6]
+        DIODE[HV Diodes 30kV]
+    end
+    
+    subgraph ELECTRODES["Corona Electrode System"]
+        ANODE[Copper Wire Anode]
+        CATHODE[Aluminum Foil Cathode]
+        GAP[30mm Gap]
+    end
+    
+    subgraph AUDIO["Acoustic System"]
+        AMP[TDA7498 Amplifier]
+        SPKR[6\" TV Woofer]
+        ENC[Ported Enclosure]
+    end
+    
+    subgraph INDICATORS["Warning System"]
+        LED_Y[Yellow LED]
+        LED_R[Red LED]
+        BUZZ[Buzzer]
+    end
+    
+    %% Power connections
+    PSU --> F1
+    F1 --> ARD
+    F1 --> RELAY
+    F1 --> MOSFET
+    
+    %% Safety chain
+    WDT --> RELAY
+    ESTOP --> RELAY
+    RELAY --> MOSFET
+    MOSFET --> HV_GENERATION
+    MOSFET --> AMP
+    
+    %% Controller connections
+    ARD <--USB--> GAME
+    ARD --> WDT
+    ARD --> LED_Y
+    ARD --> LED_R
+    ARD --> BUZZ
+    
+    %% Sensor inputs
+    TEMP --> ARD
+    OZONE --> ARD
+    UV --> ARD
+    CURRENT --> ARD
+    MIC --> ARD
+    
+    %% HV generation
+    MOSFET --> PZ1 & PZ2 & PZ3 & PZ4 & PZ5 & PZ6
+    PZ1 & PZ2 & PZ3 & PZ4 & PZ5 & PZ6 --> DIODE
+    DIODE --> ANODE
+    ANODE --> GAP --> CATHODE
+    
+    %% Audio
+    ARD --PWM--> AMP
+    AMP --> SPKR
+    SPKR --> ENC
+    
+    %% Ground reference
+    CATHODE --> GND
+    
+    style POWER fill:#ffcccc
+    style SAFETY fill:#ff9999
+    style CONTROLLER fill:#ccffcc
+    style SENSORS fill:#ffffcc
+    style HV_GENERATION fill:#ff6666
+    style INDICATORS fill:#ffff99
+```
+
+---
+
+## Circuit Description
+
+### Primary Shutdown Path (Hardware)
+```
+[Power] → [Fuse 2A] → [Relay NC] → [MOSFET] → [Load]
+                            ↑
+                    [Watchdog OR Sensors OR E-Stop]
+```
+
+### High Voltage Section
+```
+[Arduino PWM] → [MOSFET Driver] → [Piezo Array x6]
+                                          ↓
+                              [HV Diodes 30kV]
+                                          ↓
+                              [Copper Wire Anode +30kV]
+                                          ↓
+                              [30mm Air Gap]
+                                          ↓
+                              [Aluminum Foil GND]
+```
+
+### Fail-Safe Logic Table
+| Condition | Yellow LED | Red LED | Buzzer | Relay | Action |
+|-----------|-----------|---------|--------|-------|--------|
+| Normal | Off | Off | Off | Closed | Run |
+| Warning (E>2kV/m) | Flash 1Hz | Off | Beep 2kHz | Closed | Continue |
+| Warning (Temp>40C) | Flash 1Hz | Off | Beep 2kHz | Closed | Continue |
+| Critical (E>4kV/m) | On | Flash 5Hz | Continuous | Open | Shutdown |
+| Critical (Ozone>0.08ppm) | On | Flash 5Hz | Continuous | Open | Shutdown |
+| Emergency Stop | Off | On | Continuous | Open | Immediate |
+
+### Pin Assignments (Arduino Nano)
+| Pin | Function | Direction |
+|-----|----------|-----------|
+| D2 | Emergency Stop | Input |
+| D3 | Relay Control | Output |
+| D4-D9 | Piezo Triggers (x6) | Output |
+| D10 | MOSFET Gate | Output |
+| D11 | Yellow LED | Output |
+| D12 | Red LED | Output |
+| D13 | Buzzer | Output |
+| A0 | Temp Sensor 1 | Input |
+| A1 | Temp Sensor 2 | Input |
+| A2 | Ozone Sensor | Input |
+| A3 | UV Sensor | Input |
+| A4 | I2C SDA (Current) | Bidirectional |
+| A5 | I2C SCL (Current) | Bidirectional |
+| RX/TX | USB Serial | Bidirectional |
+
+### Power Budget
+| Component | Current (mA) | Voltage | Power (W) |
+|-----------|-------------|---------|-----------|
+| Arduino Nano | 50 | 5V | 0.25 |
+| Sensors (all) | 100 | 5V | 0.5 |
+| Relays | 200 | 5V | 1.0 |
+| Piezo Array | 500 | 12V | 6.0 |
+| Audio Amplifier | 2000 | 12V | 24.0 |
+| Indicators | 50 | 5V | 0.25 |
+| **Total** | **2900** | - | **32.0** |
+
+Headroom: 5A PSU provides 60W (28W headroom)
+```
