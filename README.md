@@ -1,25 +1,19 @@
-# Quantum-Flux Lab
+# Physics Idea Generator
 
-*Open-access, garage-scale physics research platform*
+*Open-access physics paper scraper → low-cost experiment suggestions*
 
 **What it does**
-- Piezo-driven corona plasma
-- Infrasound standing-wave levitation
-- Electrostatic pressure field
-- Triple-redundant safety systems
-
-**What it is for**
-- Public paper scraping (arXiv, NASA, DOE, CERN)
-- Idea generation & rapid prototyping
-- User-set budget (default ~$75)
+- Scrapes arXiv, NASA, DOE, CERN (open-access only)
+- Summarizes new findings
+- Suggests concrete, low-cost experiments you can build
+- No hardware, no budget claims – just text → ideas
 
 **Quick start**
 ```bash
-git clone https://github.com/CrazhHolmes/QuantumFluxLab.git
-cd QuantumFluxLab/ui
-python -m http.server 8080
-# Open http://localhost:8080
+git clone https://github.com/CrazhHolmes/PhysicsIdeaGenerator.git
+cd PhysicsIdeaGenerator/src
+python physics_ideas.py
 ```
 
 **License**
-MIT – fork, hack, publish, cite.
+MIT – fork, hack, cite.
