@@ -4,13 +4,13 @@
 **Document Version:** 1.0  
 **Date:** 2026-01-31  
 **Classification:** Open Access Research / Novel Implementation  
-**Budget Constraint:** ≤ USD $75  
+**Default Budget:** ~USD $75 (user-configurable)  
 
 ---
 
 ## Executive Summary
 
-This report presents the **Resonant Plasma Acoustic Trap (RPAT)** - a novel garage-scale device that synergistically combines four distinct physical phenomena to achieve stable levitation of visible matter (≥10g), measurable plasma generation (ion density >10¹² cm⁻³), and physical pressure field production (≥2N) at a total cost under USD $75.
+This report presents the **Resonant Plasma Acoustic Trap (RPAT)** - a novel garage-scale device that synergistically combines four distinct physical phenomena to achieve stable levitation of visible matter (≥10g), measurable plasma generation (ion density >10¹² cm⁻³), and physical pressure field production (≥2N) at a configurable budget (default ~$75).
 
 ### Novel Discovery Claim
 
@@ -177,7 +177,7 @@ Mathematical validity established for CTCs using dual warp drives with non-unit 
 
 ### 4.2 Garage-Scale Implementation
 
-The optical delay-line experiment ($75 budget) demonstrates:
+The optical delay-line experiment (low-cost implementation) demonstrates:
 - Choice of measurement basis AFTER photon has "entered" apparatus
 - Frame-dependent temporal ordering
 - Nonlocal correlations
@@ -265,7 +265,7 @@ This peer-reviewed trial demonstrated sustained flight of a 5m glider using pure
 
 The Quantum-Flux Lab (QFL) represents a novel garage-scale implementation of multi-physics levitation technology. By combining piezo-driven HV resonance, corona plasma generation, electrostatic pressure fields, and infrasound standing waves in a synergistic configuration, the device achieves capabilities exceeding the sum of its components.
 
-The triple-redundant safety system, real-time gamepad control, and $75 budget constraint make this an accessible yet powerful platform for exploring contactless manipulation physics.
+The triple-redundant safety system, real-time gamepad control, making this an accessible yet powerful platform for exploring contactless manipulation physics.
 
 ---
 

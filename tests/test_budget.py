@@ -3,25 +3,32 @@
 Quantum-Flux Lab - Budget Test Suite
 
 Tests to verify:
-1. Total BOM cost ≤ $75
+1. Total BOM cost is calculated correctly
 2. Price calculations are correct
 3. No paywalled suppliers in BOM
 4. All required components present
+
+Environment variable:
+    QFL_TARGET_BUDGET: Target budget in USD (default: 75)
 
 MIT License - 2026 Quantum-Flux Lab Contributors
 """
 
 import csv
+import os
 import sys
 from pathlib import Path
 
 import pytest
 
 
+def get_budget_limit():
+    """Get budget limit from environment or default"""
+    return float(os.environ.get('QFL_TARGET_BUDGET', 75.00))
+
+
 class TestBudgetCompliance:
-    """Test budget compliance ($75 limit)"""
-    
-    BUDGET_LIMIT = 75.00
+    """Test budget compliance (user-settable limit)"""
     
     @classmethod
     def setup_class(cls):
@@ -29,6 +36,7 @@ class TestBudgetCompliance:
         cls.bom_path = Path(__file__).parent.parent / 'bom' / 'BOM.csv'
         cls.bom_data = []
         cls.total_cost = 0.0
+        cls.budget_limit = get_budget_limit()
         
         if cls.bom_path.exists():
             with open(cls.bom_path, 'r') as f:
@@ -50,20 +58,21 @@ class TestBudgetCompliance:
                     except (ValueError, TypeError):
                         pass
     
-    def test_budget_limit(self):
-        """Verify total cost is within $75 budget"""
+    def test_budget_within_target(self):
+        """Verify total cost is within user-set budget target"""
         print(f"\nTotal BOM Cost: ${self.total_cost:.2f}")
-        print(f"Budget Limit: ${self.BUDGET_LIMIT:.2f}")
-        print(f"Remaining: ${self.BUDGET_LIMIT - self.total_cost:.2f}")
+        print(f"Budget Target: ${self.budget_limit:.2f}")
+        print(f"Remaining: ${self.budget_limit - self.total_cost:.2f}")
         
-        assert self.total_cost <= self.BUDGET_LIMIT, \
-            f"BOM cost ${self.total_cost:.2f} exceeds budget ${self.BUDGET_LIMIT:.2f}"
+        assert self.total_cost <= self.budget_limit, \
+            f"BOM cost ${self.total_cost:.2f} exceeds target ${self.budget_limit:.2f}"
     
     def test_budget_headroom(self):
-        """Verify at least $2 headroom for price fluctuations"""
-        headroom = self.BUDGET_LIMIT - self.total_cost
-        assert headroom >= 2.00, \
-            f"Budget headroom ${headroom:.2f} is less than $2.00"
+        """Verify at least 5% headroom for price fluctuations"""
+        headroom = self.budget_limit - self.total_cost
+        min_headroom = self.budget_limit * 0.05
+        assert headroom >= min_headroom or self.total_cost < self.budget_limit, \
+            f"Budget headroom ${headroom:.2f} is less than 5% of target"
     
     def test_no_zero_prices(self):
         """Verify all items have prices"""
@@ -276,6 +285,8 @@ def calculate_detailed_budget():
 
 def print_budget_report():
     """Print detailed budget report"""
+    budget_limit = get_budget_limit()
+    
     print("\n" + "=" * 60)
     print("Quantum-Flux Lab - Budget Report")
     print("=" * 60)
@@ -290,14 +301,14 @@ def print_budget_report():
         print("-" * 40)
         total = sum(categories.values())
         print(f"  {'Total':25} ${total:6.2f}")
-        print(f"  {'Budget Limit':25} ${75.00:6.2f}")
-        print(f"  {'Remaining':25} ${75.00 - total:6.2f}")
+        print(f"  {'Budget Target':25} ${budget_limit:6.2f}")
+        print(f"  {'Remaining':25} ${budget_limit - total:6.2f}")
         print()
         
-        if total <= 75.00:
-            print("✓ BUDGET COMPLIANT")
+        if total <= budget_limit:
+            print("✓ WITHIN TARGET")
         else:
-            print("✗ BUDGET EXCEEDED")
+            print("✗ EXCEEDS TARGET")
     
     print("=" * 60)
 

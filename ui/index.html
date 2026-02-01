@@ -229,7 +229,11 @@
             <div class="footer-left">
                 <span>⚛️ QFL v1.0</span>
                 <span class="separator">|</span>
-                <span>Budget: $72.65 / $75.00</span>
+                <span class="budget-control">
+                    <label>Budget:</label>
+                    <input type="range" id="budget-slider" min="20" max="500" step="5" value="75">
+                    <span id="budget-display">$72.65 / $75</span>
+                </span>
             </div>
             <div class="footer-center">
                 <span id="uptime">Uptime: 00:00:00</span>

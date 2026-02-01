@@ -1023,3 +1023,42 @@ html, body {
         transform: translateY(0);
     }
 }
+/* Budget slider in footer */
+.budget-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.budget-control label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.budget-control input[type="range"] {
+    width: 80px;
+    height: 4px;
+    -webkit-appearance: none;
+    background: var(--bg-hover);
+    border-radius: 2px;
+    outline: none;
+}
+
+.budget-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--accent-success);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.budget-control input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--accent-primary);
+}
+
+#budget-display {
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    min-width: 80px;
+}

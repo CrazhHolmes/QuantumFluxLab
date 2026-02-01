@@ -598,9 +598,8 @@ const COMMANDS = {
     about: {
         description: 'Show system information',
         execute: () => {
-            addTerminalLine('RPAT Research Console v1.0', 'system');
-            addTerminalLine('Resonant Plasma Acoustic Trap', 'response');
-            addTerminalLine('Budget: $72.65 / $75.00', 'response');
+            addTerminalLine('Quantum-Flux Lab Console v1.0', 'system');
+            addTerminalLine('Open-access physics research platform', 'response');
             addTerminalLine('Open Source - MIT License', 'response');
         }
     }
@@ -715,7 +714,7 @@ Setup: Noninterfering Mach-Zehnder with polarizing beam splitters
 Result: Post-determination of photon nature in macroscopic regime
 
 [2026-01-31 17:55:00] MOST FEASIBLE GARAGE EXPERIMENT
-Delayed-Choice Optical Delay Line ($50-75 budget)
+Delayed-Choice Optical Delay Line (low-cost optical experiment)
 Demonstrates the PRINCIPLE of temporal nonlocality.
 
 See full log: logs/Log_time_travel.log`,
@@ -774,6 +773,35 @@ function update() {
 }
 
 // ============================================================================
+// Budget Slider
+// ============================================================================
+function initBudgetSlider() {
+    const budgetSlider = document.getElementById('budget-slider');
+    const budgetDisplay = document.getElementById('budget-display');
+    
+    if (!budgetSlider || !budgetDisplay) return;
+    
+    const currentCost = 72.65;
+    
+    function updateBudgetDisplay() {
+        const targetBudget = budgetSlider.value;
+        budgetDisplay.textContent = `$${currentCost.toFixed(2)} / $${targetBudget}`;
+        
+        // Color code based on budget status
+        if (currentCost > targetBudget) {
+            budgetDisplay.style.color = 'var(--accent-danger)';
+        } else if (currentCost > targetBudget * 0.9) {
+            budgetDisplay.style.color = 'var(--accent-warning)';
+        } else {
+            budgetDisplay.style.color = 'var(--accent-success)';
+        }
+    }
+    
+    budgetSlider.addEventListener('input', updateBudgetDisplay);
+    updateBudgetDisplay(); // Initial display
+}
+
+// ============================================================================
 // Initialization
 // ============================================================================
 function init() {
@@ -784,6 +812,7 @@ function init() {
     initGraph();
     initLogs();
     initModal();
+    initBudgetSlider();
     
     // Start update loops
     setInterval(update, CONFIG.updateInterval);
