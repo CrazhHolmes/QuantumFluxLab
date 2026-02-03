@@ -1,0 +1,24 @@
+  ╭───────────────────────────────────╮
+  │       SynapseScanner v1.0.0       │
+  │   Quantum Research Intelligence   │
+  ╰───────────────────────────────────╯
+
+  ✔ Found 15 papers
+  arxiv.org/abs/1104.0917v1  ━━━━━━━━━━━━━━━━━━━━━━━━  15/15  100%
+
+  ╭── Discoveries ─────────────────────────────────────────────╮
+  │  ⚛  Quantum breakthrough
+  │     Test quantum erasure with polarized lenses & laser pointer
+  │     ~$30 · Easy
+  │
+  ╰────────────────────────────────────────────────────────────╯
+
+  ⚛  Quantum breakthrough
+    Quantum erasure can be demonstrated with inexpensive optical
+    components, opening a low-cost pathway for teaching advanced
+    quantum-mechanics experiments in undergraduate labs.
+
+  keywords  entanglement ⣿⣿⣿  topology ⣿⣿⣿
+
+  ✔ Done · 15 papers · 1 patterns · 0.7s
+  ⚡ github.com/CrazhHolmes/SynapseScanner

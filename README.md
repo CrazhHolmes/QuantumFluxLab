@@ -17,25 +17,30 @@
 
 ## Demo
 
-<!-- Replace with your own recording: asciinema rec demo.cast && agg demo.cast demo.gif -->
+<!-- Captured from a live run against the arXiv API -->
 ```
   ╭───────────────────────────────────╮
-  │     SynapseScanner v1.0.0        │
-  │  Quantum Research Intelligence    │
+  │       SynapseScanner v1.0.0       │
+  │   Quantum Research Intelligence   │
   ╰───────────────────────────────────╯
 
   ✔ Found 15 papers
-  arxiv.org/abs/2501.12345  ━━━━━━━━━━━━━━━━━━━━━━━━  15/15  100%
+  arxiv.org/abs/1104.0917v1  ━━━━━━━━━━━━━━━━━━━━━━━━  15/15  100%
 
-  ╭── Discoveries ──────────────────────────────────────────╮
-  │  ⚛  Quantum breakthrough                               │
-  │     Test quantum erasure with polarized lenses...       │
-  │     ~$30 · Easy                                         │
-  ╰─────────────────────────────────────────────────────────╯
+  ╭── Discoveries ─────────────────────────────────────────────╮
+  │  ⚛  Quantum breakthrough
+  │     Test quantum erasure with polarized lenses & laser pointer
+  │     ~$30 · Easy
+  ╰────────────────────────────────────────────────────────────╯
 
-  keywords  quantum ⣿⣿⣿  topology ⣶⣶⣶  spin ⣤⣤⣤
+  ⚛  Quantum breakthrough
+    Quantum erasure can be demonstrated with inexpensive optical
+    components, opening a low-cost pathway for teaching advanced
+    quantum-mechanics experiments in undergraduate labs.
 
-  ✔ Done · 15 papers · 2 patterns · 1.8s
+  keywords  entanglement ⣿⣿⣿  topology ⣿⣿⣿
+
+  ✔ Done · 15 papers · 1 patterns · 0.7s
   ⚡ github.com/CrazhHolmes/SynapseScanner
 ```
 
