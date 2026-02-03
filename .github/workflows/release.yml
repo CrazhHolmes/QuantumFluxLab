@@ -19,12 +19,12 @@ jobs:
       - name: Install build tools
         run: pip install build
       - name: Build wheel
-        run: python -m build -w src/
+        run: python -m build -w
       - name: Publish to PyPI
         if: ${{ secrets.PYPI_API_TOKEN != '' }}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: src/dist
+          packages-dir: dist
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
       - name: Create GitHub Release

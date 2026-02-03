@@ -12,11 +12,18 @@ import requests
 import time
 import collections
 
-from cli_extras import (
-    show_banner, show_status, show_progress, show_results,
-    show_keywords, show_summary, show_cheat, matrix_rain,
-    apply_noir, hide_cursor, show_cursor,
-)
+try:
+    from synapsescanner.cli_extras import (
+        show_banner, show_status, show_progress, show_results,
+        show_keywords, show_summary, show_cheat, matrix_rain,
+        apply_noir, hide_cursor, show_cursor,
+    )
+except ImportError:
+    from cli_extras import (
+        show_banner, show_status, show_progress, show_results,
+        show_keywords, show_summary, show_cheat, matrix_rain,
+        apply_noir, hide_cursor, show_cursor,
+    )
 
 WHITELIST = [
     "arxiv.org", "biorxiv.org", "chemrxiv.org", "medrxiv.org",

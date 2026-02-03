@@ -15,9 +15,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install deps
         run: |
-          pip install -r src/requirements.txt
+          pip install -r synapsescanner/requirements.txt
           pip install flake8 pytest
       - name: Lint
-        run: flake8 src/ --max-line-length=120 --ignore=E501,W503
+        run: flake8 synapsescanner/ --max-line-length=120 --ignore=E501,W503
       - name: Test
-        run: pytest src/tests/ -v || echo "No tests yet"
+        run: pytest tests/ -v || echo "No tests yet"

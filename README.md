@@ -49,8 +49,15 @@
 ```bash
 git clone https://github.com/CrazhHolmes/SynapseScanner.git
 cd SynapseScanner
-pip install -r src/requirements.txt
-python src/universal_scanner.py
+pip install -r synapsescanner/requirements.txt
+python synapsescanner/universal_scanner.py
+```
+
+Or install as a package:
+
+```bash
+pip install .
+synapsescanner
 ```
 
 ## CLI flags
@@ -78,7 +85,7 @@ Paper URLs in the progress bar are **clickable** in Windows Terminal, iTerm2, an
 - `requests` (the only runtime dependency that isn't stdlib)
 
 ```bash
-pip install -r src/requirements.txt
+pip install -r synapsescanner/requirements.txt
 ```
 
 ## License
