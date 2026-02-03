@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synapsescanner"
-version = "1.1.0"
+version = "1.1.1"
 description = "Fast, click-through CLI for open-access research papers"
 readme = "README.md"
 license = "MIT"

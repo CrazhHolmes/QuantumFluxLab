@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.1] -- 2026-02-02
+
+### Fixed
+- Windows cp1252 encoding crash (force UTF-8 stdout)
+- Restructured as installable Python package (`pip install .`)
+
 ## [v1.1.0] -- 2026-02-02
 
 ### Changed
