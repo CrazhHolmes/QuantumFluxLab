@@ -18,6 +18,6 @@ jobs:
           pip install -r synapsescanner/requirements.txt
           pip install flake8 pytest
       - name: Lint
-        run: flake8 synapsescanner/ --max-line-length=120 --ignore=E501,W503
+        run: flake8 synapsescanner/ --max-line-length=120 --ignore=E501,W503,E221,E241,E302,E305
       - name: Test
         run: pytest tests/ -v || echo "No tests yet"

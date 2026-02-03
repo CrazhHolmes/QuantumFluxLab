@@ -8,7 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write      # needed for PyPI trusted publishing
       contents: write      # needed for GitHub release
     steps:
       - uses: actions/checkout@v4
