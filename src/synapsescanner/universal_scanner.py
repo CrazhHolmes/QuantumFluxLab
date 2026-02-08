@@ -27,17 +27,11 @@ from synapsescanner.cli_extras import (
 
 # Import new modules (with graceful fallback)
 try:
-    # Import sources to register them
     from synapsescanner.sources import Paper, get_source, list_sources, SOURCE_REGISTRY
-    from synapsescanner.sources.arxiv import ArXivSource
-    from synapsescanner.sources.semantic_scholar import SemanticScholarSource
-    from synapsescanner.sources.pubmed import PubMedSource
-    from synapsescanner.sources.biorxiv import BioRxivSource
     from synapsescanner.cache import get_cache
-    from synapsescanner.config import get_config
+    from synapscescanner.config import get_config
     CACHE_AVAILABLE = True
-except ImportError as e:
-    print(f"Import error: {e}")
+except ImportError:
     CACHE_AVAILABLE = False
 
 try:

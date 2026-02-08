@@ -1,10 +1,12 @@
-# SynapseScanner
+# SynapseScanner v1.3.0
 
 **A clean Python CLI that searches open-access research papers and surfaces cross-disciplinary breakthrough patterns.**
 
 ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)
 ![MIT License](https://img.shields.io/badge/license-MIT-green.svg)
 ![CI](https://github.com/CrazhHolmes/SynapseScanner/actions/workflows/ci.yml/badge.svg)
+
+**New in v1.3.0**: Multi-source search, AI digest, Knowledge Graph, Obsidian export, Watch mode!
 
 ---
 
@@ -17,7 +19,7 @@ SynapseScanner fetches recent papers from arXiv (with more sources planned), sca
 <!-- Captured from a live run against the arXiv API -->
 ```
   ╭───────────────────────────────────╮
-  │       SynapseScanner v1.0.0       │
+  │       SynapseScanner v1.3.0       │
   │   Quantum Research Intelligence   │
   ╰───────────────────────────────────╯
 
@@ -90,6 +92,8 @@ synapsescanner --cheat
 
 ## Full usage
 
+### Basic usage
+
 ```
 synapsescanner [QUERY] [--max-results N] [--noir] [--matrix] [--cheat]
 ```
@@ -101,12 +105,41 @@ synapsescanner [QUERY] [--max-results N] [--noir] [--matrix] [--cheat]
 | `--matrix` | Matrix rain easter egg before scanning |
 | `--cheat` | Print CLI reference card and exit |
 
+### v1.3.0 Features
+
+```bash
+# Multi-source search (default: arxiv, semantic_scholar)
+synapsescanner "quantum" --sources arxiv,semantic_scholar,pubmed,biorxiv
+
+# AI-powered summaries (requires Ollama or OpenAI API key)
+synapsescanner "neural networks" --summarize
+
+# Export to Obsidian markdown
+synapsescanner "graphene" --md > notes.md
+synapsescanner "AI" --export-obsidian ~/MyVault
+
+# Export to JSON for piping
+synapsescanner "physics" --json | jq '.papers[].title'
+
+# Watch mode (check every 6 hours)
+synapsescanner "CRISPR" --watch
+synapsescanner "quantum" --watch --notify  # with webhook
+
+# Rabbit hole mode (follow references)
+synapsescanner "time crystals" --depth 2
+
+# Bypass cache
+synapsescanner "new topic" --fresh
+```
+
 ### Environment variables
 
 | Variable | Equivalent flag | Description |
 |----------|----------------|-------------|
 | `SYNAPSE_MATRIX=1` | `--matrix` | Enable Matrix-rain easter egg |
 | `SYNAPSE_NOIR=1` | `--noir` | Force greyscale colors |
+| `OPENAI_API_KEY` | - | Enable OpenAI summarization |
+| `SYNAPSE_AI=ollama` | `--summarize` | Default AI provider |
 
 Environment variables and flags can be combined:
 
@@ -136,15 +169,18 @@ SynapseScanner scans paper titles and abstracts for four cross-disciplinary patt
 
 ## Data sources
 
-**Currently active:**
+**Active in v1.3.0:**
 
 | Source | URL | Status |
 |--------|-----|--------|
-| arXiv | arxiv.org | Active -- fetches via Atom API |
+| arXiv | arxiv.org | ✅ Active -- Atom API |
+| Semantic Scholar | semanticscholar.org | ✅ Active -- Graph API |
+| PubMed | ncbi.nlm.nih.gov | ✅ Active -- E-utilities |
+| bioRxiv/MedRxiv | biorxiv.org | ✅ Active -- Public API |
 
 **In whitelist (planned):**
 
-bioRxiv, chemRxiv, medRxiv, OSF, Zenodo, NASA Technical Reports, OSTI, CERN, AIP, APS, IOP, PNAS, Nature, Science, Cell, Quanta Magazine, Phys.org, SciTechDaily
+chemRxiv, OSF, Zenodo, NASA Technical Reports, OSTI, CERN, AIP, APS, IOP, PNAS, Nature, Science, Cell, Quanta Magazine, Phys.org, SciTechDaily
 
 ## Windows / PowerShell shortcut
 

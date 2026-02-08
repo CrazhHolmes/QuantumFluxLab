@@ -2,3 +2,8 @@
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 python-dotenv>=1.0.0
+
+# Optional (uncomment if needed)
+# pyyaml>=6.0       # For advanced config editing
+# ollama>=0.1.0     # For local AI summarization
+# openai>=1.0.0     # For OpenAI API summarization

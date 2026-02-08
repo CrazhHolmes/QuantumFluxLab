@@ -82,7 +82,7 @@ atexit.register(show_cursor)
 # ── Banner (true-color gradient box, rounded corners) ──
 def show_banner():
     cols = shutil.get_terminal_size().columns
-    title    = "SynapseScanner v1.0.0"
+    title    = "SynapseScanner v1.3.0"
     subtitle = "Quantum Research Intelligence"
     inner = max(len(title), len(subtitle)) + 6
     pad = " " * max(0, (cols - inner - 2) // 2)
@@ -262,6 +262,116 @@ def show_summary(papers, patterns, elapsed, repo_url=None):
     sys.stdout.flush()
 
 
+# ── Hidden Connections box (rounded corners) ──
+def show_connections(connections):
+    """Display hidden connections between papers."""
+    if not connections:
+        return
+    
+    cols = shutil.get_terminal_size().columns
+    w = min(62, cols - 4)
+    br, bg, bb = _lerp(THEME.c1, THEME.c2, 0.25)
+    bdr = rgb(br, bg, bb)
+    
+    hdr = " Hidden Connections "
+    hline = "─" * 2 + hdr + "─" * max(0, w - 4 - len(hdr))
+    
+    lines = [f"\n  {bdr}╭{hline}╮{RESET}"]
+    
+    for conn in connections[:5]:  # Show top 5
+        icon = "🔗" if conn.strength >= 7 else "~"
+        lines.append(f"  {bdr}│{RESET}  {icon}  {conn.paper_a.source} ↔ {conn.paper_b.source}")
+        lines.append(f"  {bdr}│{RESET}     {DIM}{conn.reason[:50]}...{RESET}" if len(conn.reason) > 50 
+                     else f"  {bdr}│{RESET}     {DIM}{conn.reason}{RESET}")
+        # Strength indicator
+        stars = "★" * (conn.strength // 2)
+        lines.append(f"  {bdr}│{RESET}     {rgb(*THEME.ok)}{stars}{RESET}")
+        lines.append(f"  {bdr}│{RESET}")
+    
+    lines.append(f"  {bdr}╰{'─' * (w - 2)}╯{RESET}")
+    
+    sys.stdout.write("\n".join(lines) + "\n")
+    sys.stdout.flush()
+
+
+# ── AI Digest box ──
+def show_ai_digest(summary):
+    """Display AI-generated summary in a rounded box.
+    
+    Args:
+        summary: Dict with 'tldr', 'insights', 'tags'
+    """
+    if not summary:
+        return
+    
+    cols = shutil.get_terminal_size().columns
+    w = min(62, cols - 4)
+    br, bg, bb = _lerp(THEME.c1, THEME.c2, 0.75)  # Different gradient position
+    bdr = rgb(br, bg, bb)
+    
+    hdr = " AI Digest "
+    hline = "─" * 2 + hdr + "─" * max(0, w - 4 - len(hdr))
+    
+    lines = [f"\n  {bdr}╭{hline}╮{RESET}"]
+    
+    # TL;DR
+    tldr = summary.get("tldr", "")
+    if tldr:
+        lines.append(f"  {bdr}│{RESET}  {BOLD}💡 TL;DR{RESET}")
+        # Word wrap TL;DR
+        words = tldr.split()
+        line_text = ""
+        for word in words:
+            if len(line_text) + len(word) + 1 > w - 6:
+                lines.append(f"  {bdr}│{RESET}     {DIM}{line_text}{RESET}")
+                line_text = word
+            else:
+                line_text += (" " if line_text else "") + word
+        if line_text:
+            lines.append(f"  {bdr}│{RESET}     {DIM}{line_text}{RESET}")
+        lines.append(f"  {bdr}│{RESET}")
+    
+    # Insights
+    insights = summary.get("insights", [])
+    if insights:
+        lines.append(f"  {bdr}│{RESET}  {BOLD}🔍 Key Insights{RESET}")
+        for insight in insights[:3]:
+            # Truncate if too long
+            display = insight[:w-8] + "..." if len(insight) > w-8 else insight
+            lines.append(f"  {bdr}│{RESET}     {DIM}• {display}{RESET}")
+        lines.append(f"  {bdr}│{RESET}")
+    
+    # Tags
+    tags = summary.get("tags", [])
+    if tags:
+        tag_str = " ".join(f"#{t}" for t in tags[:5])
+        lines.append(f"  {bdr}│{RESET}  {BOLD}🏷️  Tags{RESET} {rgb(*THEME.c2)}{tag_str}{RESET}")
+    
+    lines.append(f"  {bdr}╰{'─' * (w - 2)}╯{RESET}")
+    
+    sys.stdout.write("\n".join(lines) + "\n")
+    sys.stdout.flush()
+
+
+# ── Webhook notification ──
+def notify_webhook(url: str, payload: dict) -> bool:
+    """Send notification webhook.
+    
+    Args:
+        url: Webhook URL
+        payload: JSON payload
+        
+    Returns:
+        True if successful
+    """
+    try:
+        import requests
+        resp = requests.post(url, json=payload, timeout=10)
+        return resp.status_code < 400
+    except Exception:
+        return False
+
+
 # ── Matrix rain (easter egg, --matrix flag) ──
 def matrix_rain(duration=3):
     cols = shutil.get_terminal_size().columns
@@ -278,27 +388,56 @@ def matrix_rain(duration=3):
 # ── Cheat sheet ──
 def show_cheat():
     print(f"""
-  {BOLD}SynapseScanner CLI{RESET}
+  {BOLD}SynapseScanner CLI v1.3.0{RESET}
 
   {DIM}USAGE{RESET}
     synapsescanner [QUERY] [OPTIONS]
 
-  {DIM}EXAMPLES{RESET}
+  {DIM}BASIC EXAMPLES{RESET}
     synapsescanner                        Fetch recent papers
     synapsescanner "quantum entanglement" Search for a topic
     synapsescanner "CRISPR" --max-results 5
 
+  {DIM}MULTI-SOURCE SEARCH{RESET}
+    synapsescanner "AI" --sources arxiv,semantic_scholar
+    synapsescanner "CRISPR" --sources arxiv,pubmed,biorxiv
+
+  {DIM}AI DIGEST (requires Ollama or OpenAI){RESET}
+    synapsescanner "quantum" --summarize
+    SYNAPSE_AI=ollama synapsescanner "neural networks"
+
+  {DIM}RABBIT HOLES (reference tracing){RESET}
+    synapsescanner "graphene" --depth 2
+
+  {DIM}EXPORT OPTIONS{RESET}
+    synapsescanner "physics" --json > papers.json
+    synapsescanner "biology" --md > note.md
+    synapsescanner "AI" --export-obsidian ~/MyVault
+
+  {DIM}WATCH MODE{RESET}
+    synapsescanner "quantum" --watch
+    synapsescanner "AI" --watch --notify
+
   {DIM}OPTIONS{RESET}
-    --max-results N   Papers to fetch (default 15)
-    --noir            Greyscale mode
-    --matrix          Matrix rain easter egg
-    --cheat           This screen
+    --max-results N       Papers to fetch (default 15)
+    --sources LIST        Comma-separated source list
+    --fresh               Bypass cache
+    --summarize           Enable AI summarization
+    --depth N             Rabbit hole depth (0-3)
+    --watch               Loop forever (6hr intervals)
+    --notify              Webhook notifications
+    --json                JSON output
+    --md                  Markdown output
+    --noir                Greyscale mode
+    --matrix              Matrix rain easter egg
+    --cheat               This screen
 
   {DIM}ENVIRONMENT{RESET}
-    SYNAPSE_MATRIX=1  same as --matrix
-    SYNAPSE_NOIR=1    same as --noir
+    SYNAPSE_MATRIX=1      same as --matrix
+    SYNAPSE_NOIR=1        same as --noir
+    OPENAI_API_KEY=xxx    Enable OpenAI backend
 
   {DIM}PRO TIP{RESET}
-    Paper URLs in the progress line are {ITALIC}clickable{RESET}
-    in Windows Terminal, iTerm2, and GNOME Terminal.
+    Paper URLs are {ITALIC}clickable{RESET} in Windows Terminal,
+    iTerm2, and GNOME Terminal.
 """)
