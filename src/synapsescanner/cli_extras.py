@@ -372,6 +372,83 @@ def notify_webhook(url: str, payload: dict) -> bool:
         return False
 
 
+# ── Breakthrough Preview (v1.4.0 AutoDocs) ──
+def show_breakthrough_preview(doc_path: str):
+    """Show preview of generated breakthrough documentation.
+    
+    Args:
+        doc_path: Path to the generated markdown file
+    """
+    from pathlib import Path
+    
+    try:
+        content = Path(doc_path).read_text(encoding='utf-8')
+        # Extract title
+        title = "Breakthrough Documentation"
+        for line in content.split('\n')[:5]:
+            if line.startswith('# '):
+                title = line[2:].strip()
+                break
+        
+        cols = shutil.get_terminal_size().columns
+        w = min(62, cols - 4)
+        br, bg, bb = _lerp(THEME.c1, THEME.c2, 0.5)
+        bdr = rgb(br, bg, bb)
+        
+        hdr = " AutoDocs Generated "
+        hline = "─" * 2 + hdr + "─" * max(0, w - 4 - len(hdr))
+        
+        lines = [f"\n  {bdr}╭{hline}╮{RESET}"]
+        lines.append(f"  {bdr}│{RESET}  {BOLD}📝 {title[:50]}{RESET}")
+        lines.append(f"  {bdr}│{RESET}")
+        lines.append(f"  {bdr}│{RESET}  {DIM}Saved to:{RESET}")
+        lines.append(f"  {bdr}│{RESET}  {rgb(*THEME.c2)}{doc_path}{RESET}")
+        lines.append(f"  {bdr}│{RESET}")
+        lines.append(f"  {bdr}│{RESET}  {DIM}Files generated:{RESET}")
+        
+        # Check for related files
+        doc_dir = Path(doc_path).parent
+        doc_name = Path(doc_path).stem
+        
+        files_to_check = [
+            ("README.md", "Updated"),
+            ("docs/BREAKTHROUGHS.md", "Log entry added"),
+        ]
+        
+        for filename, status in files_to_check:
+            filepath = doc_dir / filename
+            if filepath.exists():
+                lines.append(f"  {bdr}│{RESET}    {rgb(*THEME.ok)}✓{RESET} {filename} ({status})")
+        
+        lines.append(f"  {bdr}╰{'─' * (w - 2)}╯{RESET}")
+        
+        sys.stdout.write("\n".join(lines) + "\n")
+        sys.stdout.flush()
+        
+    except Exception as e:
+        # Silent fail - preview is non-critical
+        pass
+
+
+def confirm_git_commit() -> bool:
+    """Interactive confirmation for git commit.
+    
+    Returns:
+        True if user confirms
+    """
+    print(f"\n  {BOLD}Auto-Commit Confirmation{RESET}")
+    print(f"  {DIM}This will commit documentation changes to git.{RESET}")
+    print(f"\n  Commit message format:")
+    print(f"    docs(breakthrough): [Pattern Name]")
+    print(f"\n  {rgb(*THEME.wrn)}⚠ Use --force to skip this prompt{RESET}")
+    
+    try:
+        response = input(f"\n  Proceed? [y/N]: ").strip().lower()
+        return response in ('y', 'yes')
+    except (EOFError, KeyboardInterrupt):
+        return False
+
+
 # ── Matrix rain (easter egg, --matrix flag) ──
 def matrix_rain(duration=3):
     cols = shutil.get_terminal_size().columns

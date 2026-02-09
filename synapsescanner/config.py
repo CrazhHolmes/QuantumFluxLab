@@ -40,6 +40,15 @@ cache_hours: 24
 
 # Default search depth for rabbit holes (0-3)
 default_depth: 0
+
+# AutoDocs settings (v1.4.0)
+auto_docs: false
+auto_commit: false
+breakthrough_log: true
+update_readme: false
+max_readme_entries: 5
+include_ai_summary: true
+include_connections: true
 """
     
     def __init__(self, config_path: Optional[str] = None):
@@ -236,6 +245,47 @@ default_depth: 0
     @default_depth.setter
     def default_depth(self, value: int):
         self._data["default_depth"] = value
+    
+    # AutoDocs properties (v1.4.0)
+    @property
+    def auto_docs(self) -> bool:
+        return self._data.get("auto_docs", False)
+    
+    @auto_docs.setter
+    def auto_docs(self, value: bool):
+        self._data["auto_docs"] = value
+    
+    @property
+    def auto_commit(self) -> bool:
+        return self._data.get("auto_commit", False)
+    
+    @auto_commit.setter
+    def auto_commit(self, value: bool):
+        self._data["auto_commit"] = value
+    
+    @property
+    def breakthrough_log(self) -> bool:
+        return self._data.get("breakthrough_log", True)
+    
+    @breakthrough_log.setter
+    def breakthrough_log(self, value: bool):
+        self._data["breakthrough_log"] = value
+    
+    @property
+    def update_readme(self) -> bool:
+        return self._data.get("update_readme", False)
+    
+    @update_readme.setter
+    def update_readme(self, value: bool):
+        self._data["update_readme"] = value
+    
+    @property
+    def max_readme_entries(self) -> int:
+        return self._data.get("max_readme_entries", 5)
+    
+    @max_readme_entries.setter
+    def max_readme_entries(self, value: int):
+        self._data["max_readme_entries"] = value
     
     def get(self, key: str, default: Any = None) -> Any:
         """Get a config value by key."""

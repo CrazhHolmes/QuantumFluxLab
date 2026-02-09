@@ -1,0 +1,13 @@
+🚀 SynapseScanner v1.4.0 is live!
+
+GitHub: https://github.com/CrazhHolmes/SynapseScanner
+Release: https://github.com/CrazhHolmes/SynapseScanner/releases/tag/v1.4.0
+
+What's new:
+• Citation tracking -- see who cited your discoveries
+• AutoDocs -- breakthroughs auto-documented to README
+• Multi-source: ArXiv + Semantic Scholar + PubMed + bioRxiv
+
+pip install synapsescanner
+
+#Python #CLI #OpenScience #ResearchTools

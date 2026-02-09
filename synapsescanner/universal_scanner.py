@@ -23,6 +23,7 @@ from synapsescanner.cli_extras import (
     show_keywords, show_summary, show_cheat, matrix_rain,
     apply_noir, hide_cursor, show_cursor,
     show_connections, show_ai_digest, notify_webhook,
+    show_breakthrough_preview,
 )
 
 # Import new modules (with graceful fallback)
@@ -64,6 +65,13 @@ try:
     CITATIONS_AVAILABLE = True
 except ImportError:
     CITATIONS_AVAILABLE = False
+
+try:
+    from synapsescanner.autodocs import BreakthroughDocumenter
+    from synapsescanner.git_autocommit import GitAutoCommit
+    AUTODOCS_AVAILABLE = True
+except ImportError:
+    AUTODOCS_AVAILABLE = False
 
 REPO_URL = "https://github.com/CrazhHolmes/SynapseScanner"
 VERSION = "1.4.0"
@@ -338,6 +346,16 @@ def main():
     # New v1.4.0 arguments
     parser.add_argument("--citations", action="store_true",
                         help="Show citation tracking for discovered papers")
+    parser.add_argument("--auto-docs", action="store_true",
+                        help="Enable automatic breakthrough documentation generation")
+    parser.add_argument("--update-readme", action="store_true",
+                        help="Update README.md with latest findings (requires --auto-docs)")
+    parser.add_argument("--breakthrough-log", action="store_true",
+                        help="Append to docs/BREAKTHROUGHS.md (requires --auto-docs)")
+    parser.add_argument("--auto-commit", action="store_true",
+                        help="Automatically commit docs to git (requires --auto-docs)")
+    parser.add_argument("--force", action="store_true",
+                        help="Force operations even with uncommitted changes")
     
     args = parser.parse_args()
     
@@ -428,6 +446,83 @@ def main():
         # Detect patterns
         patterns = detect_patterns(papers)
         show_results(patterns)
+        
+        # AutoDocs: Generate breakthrough documentation (v1.4.0)
+        if patterns and AUTODOCS_AVAILABLE:
+            # Always prepare docs internally on breakthrough detection (hard-coded)
+            documenter = BreakthroughDocumenter()
+            git = GitAutoCommit()
+            
+            # Check if auto-docs explicitly enabled or configured
+            auto_docs_enabled = args.auto_docs
+            
+            if auto_docs_enabled and not args.json and not args.md:
+                show_status("Generating breakthrough documentation...", "info")
+                
+                docs_generated = []
+                
+                for pattern in patterns:
+                    # Get AI summary for this pattern if available
+                    ai_summary = None
+                    if ai_summaries:
+                        # Match by pattern name in insights
+                        for summary in ai_summaries:
+                            if any(kw in pattern.get("pattern", "").lower() 
+                                   for kw in ["quantum", "material", "temporal", "AI"]):
+                                ai_summary = {
+                                    "tldr": summary.tldr,
+                                    "insights": summary.insights,
+                                    "tags": summary.tags
+                                }
+                                break
+                    
+                    # Generate breakthrough doc
+                    doc_content = documenter.generate_breakthrough_doc(
+                        pattern=pattern,
+                        papers=papers,
+                        connections=connections,
+                        ai_summary=ai_summary,
+                        query=args.query or ""
+                    )
+                    
+                    # Save full documentation
+                    doc_path = documenter.save_breakthrough_doc(pattern, doc_content)
+                    if doc_path:
+                        docs_generated.append(str(doc_path))
+                    
+                    # Update breakthrough log
+                    if args.breakthrough_log:
+                        documenter.maintain_breakthrough_log(pattern, doc_content)
+                    
+                    # Update README
+                    if args.update_readme:
+                        documenter.update_readme(pattern, doc_content)
+                
+                # Show preview
+                if docs_generated:
+                    show_status(f"Generated {len(docs_generated)} breakthrough doc(s)", "ok", done=True)
+                    show_breakthrough_preview(docs_generated[0])
+                
+                # Auto-commit if requested
+                if args.auto_commit and docs_generated:
+                    if git.should_auto_commit(force=args.force):
+                        files_to_commit = docs_generated
+                        if args.update_readme:
+                            files_to_commit.append("README.md")
+                        if args.breakthrough_log:
+                            files_to_commit.append("docs/BREAKTHROUGHS.md")
+                        
+                        # Commit each pattern
+                        for pattern in patterns:
+                            if git.commit_breakthrough(files_to_commit, pattern.get("pattern", "Breakthrough")):
+                                show_status("Changes committed", "ok", done=True)
+                                
+                                # Push if requested
+                                if git.push_changes(force=args.force):
+                                    show_status("Pushed to origin", "ok", done=True)
+                                break
+                    else:
+                        git.print_status()
         
         # Show connections
         if connections and not args.json and not args.md:
