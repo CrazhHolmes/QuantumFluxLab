@@ -1,0 +1,91 @@
+name: Release Promotion
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to promote (e.g., v1.4.0)'
+        required: true
+        default: 'v1.4.0'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip install atproto
+      
+      - name: Generate release message
+        id: message
+        run: |
+          VERSION="${{ github.event.release.tag_name || github.event.inputs.version }}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Create message based on version
+          if [[ "$VERSION" == *"1.4.0"* ]]; then
+            MESSAGE="🚀 SynapseScanner $VERSION is live! New: Citation tracking -- see who cited your discovered papers. Plus: Multi-source search, AI summaries, Obsidian export. https://github.com/${{ github.repository }}/releases/tag/$VERSION"
+          else
+            MESSAGE="🚀 SynapseScanner $VERSION released! https://github.com/${{ github.repository }}/releases/tag/$VERSION"
+          fi
+          
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+          echo "Generated message: $MESSAGE"
+      
+      - name: Post to Bluesky
+        env:
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
+        run: |
+          python3 << 'EOF'
+          import os
+          import sys
+          from atproto import Client
+          
+          handle = os.environ.get('BLUESKY_HANDLE')
+          password = os.environ.get('BLUESKY_APP_PASSWORD')
+          message = """${{ steps.message.outputs.message }}"""
+          
+          if not handle or not password:
+              print("[!] Bluesky credentials not configured")
+              sys.exit(0)
+          
+          try:
+              client = Client()
+              client.login(handle, password)
+              response = client.send_post(text=message)
+              print(f"[OK] Posted to Bluesky: {message[:60]}...")
+              print(f"[OK] Post URI: {response.uri}")
+          except Exception as e:
+              print(f"[!] Failed to post: {e}")
+              sys.exit(1)
+          EOF
+      
+      - name: Post to Twitter/X
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        run: |
+          echo "[*] Twitter posting would happen here"
+          echo "[*] Message: ${{ steps.message.outputs.message }}"
+          # Uncomment when Twitter API credentials are added
+          # pip install tweepy
+          # python3 -c "import tweepy; ..."
+      
+      - name: Notify completion
+        run: |
+          echo "[OK] Release ${{ steps.message.outputs.version }} promotion complete!"
+          echo "Posted to: Bluesky"

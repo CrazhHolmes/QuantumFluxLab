@@ -27,11 +27,17 @@ from synapsescanner.cli_extras import (
 
 # Import new modules (with graceful fallback)
 try:
+    # Import sources to register them
     from synapsescanner.sources import Paper, get_source, list_sources, SOURCE_REGISTRY
+    from synapsescanner.sources.arxiv import ArXivSource
+    from synapsescanner.sources.semantic_scholar import SemanticScholarSource
+    from synapsescanner.sources.pubmed import PubMedSource
+    from synapsescanner.sources.biorxiv import BioRxivSource
     from synapsescanner.cache import get_cache
-    from synapscescanner.config import get_config
+    from synapsescanner.config import get_config
     CACHE_AVAILABLE = True
-except ImportError:
+except ImportError as e:
+    print(f"Import error: {e}")
     CACHE_AVAILABLE = False
 
 try:
@@ -53,8 +59,14 @@ try:
 except ImportError:
     EXPORTERS_AVAILABLE = False
 
+try:
+    from synapsescanner.citations import CitationTracker, format_citation_report
+    CITATIONS_AVAILABLE = True
+except ImportError:
+    CITATIONS_AVAILABLE = False
+
 REPO_URL = "https://github.com/CrazhHolmes/SynapseScanner"
-VERSION = "1.3.0"
+VERSION = "1.4.0"
 
 
 def fetch_from_sources(query: str, sources: List[str], limit: int, 
@@ -323,6 +335,10 @@ def main():
     parser.add_argument("--export-obsidian", type=str, default=None,
                         help="Export to Obsidian vault path")
     
+    # New v1.4.0 arguments
+    parser.add_argument("--citations", action="store_true",
+                        help="Show citation tracking for discovered papers")
+    
     args = parser.parse_args()
     
     # Load config
@@ -425,6 +441,19 @@ def main():
                     "insights": summary.insights,
                     "tags": summary.tags
                 })
+        
+        # Show citation tracking (v1.4.0)
+        if args.citations and CITATIONS_AVAILABLE and not args.json and not args.md:
+            show_status("Fetching citation data...", "info")
+            tracker = CitationTracker()
+            
+            for paper in papers[:3]:  # Check top 3 papers
+                citations = tracker.get_citations(paper.id, paper.source)
+                if citations:
+                    report = format_citation_report(citations, paper.title)
+                    print(report)
+            
+            show_status("Citation analysis complete", "ok", done=True)
         
         # Show keywords
         counter = build_keyword_counter(papers)
